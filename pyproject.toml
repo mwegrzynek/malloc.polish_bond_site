@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "malloc-polish-bond-site"
+version = "1.0.0"
+description = ""
+authors = ["Michał Węgrzynek <michal.wegrzynek@malloc.com.pl>"]
+readme = "README.md"
+packages = [{include = "malloc", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.2"
+uvicorn = {extras = ["standard"], version = "^0.27.1"}
+requests = "^2.31.0"
+pydantic-settings = "^2.2.1"
+malloc-polish-bond = {path = "../malloc.polish_bond", develop = true}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.1"
+
+[tool.poetry.scripts]
+start = "malloc.polish_bond_site.scripts:start"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

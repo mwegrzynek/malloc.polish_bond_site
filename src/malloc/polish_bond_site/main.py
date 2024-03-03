@@ -3,7 +3,8 @@ import logging
 from typing import Annotated
 
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Response
+from fastapi.responses import PlainTextResponse
 from malloc.polish_bond.bond import BondMaker, Bond
 
 
@@ -43,7 +44,31 @@ async def daily_values(bond: Annotated[Bond, Depends(bond_by_name)]) -> list[dic
     return bond.daily_values.reset_index().to_dict("records")
 
 
+@app.get("/by_name/{name}/{purchase_date}/daily_values/csv")
+async def daily_values(
+    bond: Annotated[Bond, Depends(bond_by_name)]    
+):
+    """Return bond daily values."""
+    return Response(
+        content=(
+            bond
+            .daily_values
+            .rename(
+                columns={
+                    "value": "marketPrice"
+                }
+            )
+            .to_csv(index=True, sep=";")
+        ),
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename={bond.name}_{bond.purchase_date}_daily_values.csv"
+        }
+    )
+
+
 @app.get("/by_name/{name}/{purchase_date}/cash_flow")
 async def daily_values(bond: Annotated[Bond, Depends(bond_by_name)]) -> list[dict]:
     """Return bond daily values."""
     return bond.cash_flow.reset_index().to_dict("records")
+

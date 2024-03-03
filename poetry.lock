@@ -268,12 +268,12 @@ files = [
 
 [[package]]
 name = "malloc-polish-bond"
-version = "1.0.5"
+version = "1.0.6"
 description = "Calculates daily values and cash flow for Polish retail bonds"
 optional = false
 python-versions = "^3.11"
 files = []
-develop = true
+develop = false
 
 [package.dependencies]
 pandas = "^2.1.4"
@@ -283,8 +283,10 @@ requests = "^2.31.0"
 xlrd = "^2.0.1"
 
 [package.source]
-type = "directory"
-url = "../malloc.polish_bond"
+type = "git"
+url = "https://github.com/mwegrzynek/malloc.polish_bond.git"
+reference = "HEAD"
+resolved_reference = "841defdb9efc3eca1bb801f0393caa9f650ea1f0"
 
 [[package]]
 name = "numpy"
@@ -1080,4 +1082,4 @@ test = ["pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "39142ffd6a93e98dddc26eee2c8e71ad4bb2691562c5393f33f0848bffd3b38d"
+content-hash = "b540d0c4a04f4ae1212c6886ebe40ee07acaa1f17b88e4a34bce5c27ee267ea9"

@@ -12,7 +12,7 @@ fastapi = "^0.109.2"
 uvicorn = {extras = ["standard"], version = "^0.27.1"}
 requests = "^2.31.0"
 pydantic-settings = "^2.2.1"
-malloc-polish-bond = {path = "../malloc.polish_bond", develop = true}
+malloc-polish-bond = {git = "https://github.com/mwegrzynek/malloc.polish_bond.git"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.1"

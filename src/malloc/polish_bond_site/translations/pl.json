@@ -21,8 +21,8 @@
 
   "stat_current_value": "Aktualna warto\u015b\u0107",
   "matured_label": "Wykupiona",
+  "no_data_label": "Brak danych",
   "stat_purchase_date": "Data zakupu",
-  "stat_nominal_purchase": "Nominalna data zakupu",
   "stat_maturity_date": "Data wykupu",
 
   "rates_heading": "Oprocentowanie",
@@ -42,6 +42,9 @@
   "event_purchase": "Zakup",
   "event_coupon": "Kupon",
   "event_redemption": "Wykup",
+  "event_projected": "Prognoza",
+
+  "no_redemption_note": "Prognoza wykupu niedost\u0119pna \u2014 oprocentowanie przysz\u0142ych okres\u00f3w nie zosta\u0142o jeszcze opublikowane.",
 
   "footer_data_source": "Dane z"
 }

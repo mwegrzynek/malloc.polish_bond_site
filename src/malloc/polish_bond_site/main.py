@@ -4,9 +4,12 @@ import logging
 from pathlib import Path
 from typing import Annotated
 
+from dateutil.relativedelta import relativedelta
+
 
 from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from malloc.polish_bond.bond import BondMaker, Bond, BOND_TYPES
 
@@ -22,7 +25,18 @@ _logger = logging.getLogger(__name__)
 app = FastAPI()
 sbm = SiteBondMaker(settings)
 
+_STATIC = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=_STATIC), name="static")
+
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
+
+
+def _fmtnum(value: float, locale: str, decimals: int = 2, sign: bool = False) -> str:
+    fmt = f"{value:+.{decimals}f}" if sign else f"{value:.{decimals}f}"
+    return fmt.replace(".", ",") if locale == "pl" else fmt
+
+
+templates.env.filters["fmtnum"] = _fmtnum
 
 TRANSLATIONS_DIR = Path(__file__).parent / "translations"
 SUPPORTED_LOCALES = {"en", "pl"}
@@ -104,7 +118,21 @@ async def bond_detail_page(
     except (KeyError, Exception):
         current_value = None
 
+    is_matured = bond.maturity_date < dt.date.today()
+
+    periods = [
+        {
+            "rate": rate,
+            "start": str(bond.purchase_date + relativedelta(months=i * bond.period_length)),
+            "end": str(bond.purchase_date + relativedelta(months=(i + 1) * bond.period_length)),
+        }
+        for i, rate in enumerate(bond.rates)
+    ]
+
+    all_rates_known = all(r is not None for r in bond.rates)
     cash_flow = bond.cash_flow.reset_index().to_dict("records")
+    if not is_matured and not all_rates_known:
+        cash_flow = [cf for cf in cash_flow if cf["event"].value != "redemption"]
 
     return templates.TemplateResponse(
         "bond_detail.html",
@@ -115,6 +143,9 @@ async def bond_detail_page(
             "path_suffix": path_suffix,
             "bond": bond,
             "current_value": current_value,
+            "is_matured": is_matured,
+            "periods": periods,
+            "all_rates_known": all_rates_known,
             "cash_flow": cash_flow,
         },
     )

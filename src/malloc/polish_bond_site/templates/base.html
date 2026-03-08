@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{{ t.site_name }}{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="/static/icon.svg">
 
   <!-- Apply saved theme before the page renders to prevent FOUC -->
   <script>
@@ -25,7 +26,10 @@
   <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
     <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
       <a href="/{{ locale }}/" class="text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors">
-        <span class="text-2xl font-bold tracking-tight">🏦 {{ t.site_name }}</span>
+        <span class="inline-flex items-center gap-2 text-2xl font-bold tracking-tight">
+          <img src="/static/icon.svg" alt="" class="w-8 h-8 rounded-lg" aria-hidden="true">
+          {{ t.site_name }}
+        </span>
       </a>
 
       <div class="flex items-center gap-3">
@@ -67,7 +71,8 @@
   </main>
 
   <footer class="mt-16 border-t border-slate-200 dark:border-slate-700 py-6 text-center text-sm text-slate-400 dark:text-slate-500">
-    {{ t.footer_data_source }} <a href="https://dane.gov.pl" target="_blank" class="underline hover:text-slate-600 dark:hover:text-slate-300">dane.gov.pl</a>
+     &copy; 2026 <a href="https://malloc.com.pl">MALLOC</a><br/>
+    {{ t.footer_data_source }} <a href="https://dane.gov.pl" target="_blank" class="underline hover:text-slate-600 dark:hover:text-slate-300">dane.gov.pl</a>  
   </footer>
 
   <script>

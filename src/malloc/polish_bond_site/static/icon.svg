@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <!-- clip the certificate corners -->
+    <clipPath id="cert-clip">
+      <rect x="9" y="13" width="46" height="38" rx="3"/>
+    </clipPath>
+  </defs>
+
+  <!-- ── background ── -->
+  <rect width="64" height="64" rx="13" fill="url(#bg)"/>
+
+  <!-- ── bond certificate body ── -->
+  <rect x="9" y="13" width="46" height="38" rx="3" fill="white" opacity="0.97"/>
+
+  <!-- Polish flag top stripe (red half) on the cert -->
+  <rect x="9" y="13" width="46" height="8" rx="0" fill="#dc2626" clip-path="url(#cert-clip)" opacity="0.90"/>
+  <!-- round only the top corners of the stripe by overlapping a white bar at the seam -->
+  <rect x="9" y="21" width="46" height="1" fill="white" opacity="0.15"/>
+
+  <!-- ── ornamental border inside cert ── -->
+  <rect x="11.5" y="15.5" width="41" height="33" rx="2"
+        fill="none" stroke="#bfdbfe" stroke-width="0.7" opacity="0.6"/>
+
+  <!-- ── large % glyph ── -->
+  <!-- top circle of % -->
+  <circle cx="26" cy="30" r="4.2" fill="none" stroke="#1e40af" stroke-width="2.8"/>
+  <!-- bottom circle of % -->
+  <circle cx="38" cy="42" r="4.2" fill="none" stroke="#1e40af" stroke-width="2.8"/>
+  <!-- diagonal bar of % -->
+  <line x1="22" y1="46" x2="42" y2="26" stroke="#1e40af" stroke-width="2.8" stroke-linecap="round"/>
+
+  <!-- ── small data lines (bottom of cert, suggest rows of text) ── -->
+  <line x1="13" y1="46" x2="22" y2="46" stroke="#bfdbfe" stroke-width="1.4" stroke-linecap="round"/>
+  <line x1="13" y1="49" x2="19" y2="49" stroke="#bfdbfe" stroke-width="1.4" stroke-linecap="round"/>
+
+  <!-- ── wax seal (red circle, bottom-right) ── -->
+  <circle cx="49" cy="46" r="7" fill="#dc2626"/>
+  <!-- star in seal -->
+  <polygon points="49,40.5 50.4,44.7 54.8,44.7 51.2,47.3 52.6,51.5 49,48.9 45.4,51.5 46.8,47.3 43.2,44.7 47.6,44.7"
+           fill="white" opacity="0.95"/>
+</svg>

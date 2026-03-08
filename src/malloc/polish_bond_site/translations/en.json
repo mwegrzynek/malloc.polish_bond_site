@@ -21,8 +21,8 @@
 
   "stat_current_value": "Current value",
   "matured_label": "Matured",
+  "no_data_label": "No data",
   "stat_purchase_date": "Purchase date",
-  "stat_nominal_purchase": "Nominal purchase",
   "stat_maturity_date": "Maturity date",
 
   "rates_heading": "Interest rates",
@@ -42,6 +42,9 @@
   "event_purchase": "Purchase",
   "event_coupon": "Coupon",
   "event_redemption": "Redemption",
+  "event_projected": "Projected",
+
+  "no_redemption_note": "Redemption projection unavailable \u2014 interest rates for future periods have not yet been published.",
 
   "footer_data_source": "Data sourced from"
 }

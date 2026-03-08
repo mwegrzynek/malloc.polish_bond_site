@@ -1,0 +1,47 @@
+{
+  "site_name": "Obligacje Detaliczne",
+
+  "tagline": "Szukaj obligacji",
+  "tagline_sub": "Podaj symbol obligacji i dat\u0119 zakupu, aby zobaczy\u0107 szczeg\u00f3\u0142y, histori\u0119 warto\u015bci i przep\u0142ywy pieni\u0119\u017cne.",
+
+  "symbol_label": "Symbol obligacji",
+  "symbol_placeholder": "np. EDO0336",
+  "symbol_hint": "Format: 3 litery + miesi\u0105c/rok wykupu (MMRR)",
+  "date_label": "Data zakupu",
+  "submit_btn": "Szukaj",
+
+  "available_types": "Dost\u0119pne typy obligacji",
+  "loading": "\u0141adowanie\u2026",
+  "unavailable": "Niedost\u0119pne",
+
+  "back_link": "\u2190 Powr\u00f3t do wyszukiwania",
+
+  "badge_capitalising": "Kapitalizuj\u0105ca",
+  "badge_coupon": "Kuponowa",
+
+  "stat_current_value": "Aktualna warto\u015b\u0107",
+  "matured_label": "Wykupiona",
+  "stat_purchase_date": "Data zakupu",
+  "stat_nominal_purchase": "Nominalna data zakupu",
+  "stat_maturity_date": "Data wykupu",
+
+  "rates_heading": "Oprocentowanie",
+  "period_label": "Okres",
+  "tbd_label": "TBA",
+
+  "chart_heading": "Warto\u015b\u0107 w czasie",
+  "chart_loading": "\u0141adowanie wykresu\u2026",
+  "chart_unavailable": "Wykres niedost\u0119pny.",
+  "chart_value_label": "Warto\u015b\u0107 (PLN)",
+
+  "cashflow_heading": "Przep\u0142ywy pieni\u0119\u017cne",
+  "col_date": "Data",
+  "col_event": "Zdarzenie",
+  "col_amount": "Kwota (PLN)",
+
+  "event_purchase": "Zakup",
+  "event_coupon": "Kupon",
+  "event_redemption": "Wykup",
+
+  "footer_data_source": "Dane z"
+}

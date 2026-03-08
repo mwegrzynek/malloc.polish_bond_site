@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}{{ t.site_name }}{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center py-12">
+
+  <div class="w-full max-w-lg">
+    <h1 class="text-3xl font-bold text-center text-slate-800 dark:text-slate-100 mb-2">{{ t.tagline }}</h1>
+    <p class="text-center text-slate-500 dark:text-slate-400 mb-8">{{ t.tagline_sub }}</p>
+
+    {% if error %}
+    <div class="mb-6 rounded-lg bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <form id="lookup-form" class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 space-y-4">
+      <div>
+        <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t.symbol_label }}</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          list="bond-suggestions"
+          placeholder="{{ t.symbol_placeholder }}"
+          required
+          pattern="[A-Za-z]{3}[0-9]{4}"
+          title="{{ t.symbol_hint }}"
+          class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent uppercase"
+        >
+        <datalist id="bond-suggestions"></datalist>
+        <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">{{ t.symbol_hint }}</p>
+      </div>
+
+      <div>
+        <label for="purchase_date" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">{{ t.date_label }}</label>
+        <input
+          type="date"
+          id="purchase_date"
+          name="purchase_date"
+          required
+          class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+        >
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold py-2.5 rounded-lg transition-colors"
+      >
+        {{ t.submit_btn }}
+      </button>
+    </form>
+
+    <div class="mt-8 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4">
+      <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">{{ t.available_types }}</p>
+      <div id="bond-types" class="flex flex-wrap gap-2">
+        <span id="bond-types-placeholder" class="text-xs text-slate-400 dark:text-slate-500">{{ t.loading }}</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  var t = {{ t | tojson }};
+  var locale = {{ locale | tojson }};
+
+  // Mirror of BOND_TYPES from bond.py: [number_of_periods, period_length]
+  var BOND_PERIODS = {
+    OTS: [1,  3],
+    ROR: [12, 1],
+    DOR: [24, 1],
+    TOS: [3,  12],
+    COI: [4,  12],
+    EDO: [10, 12],
+    ROS: [6,  12],
+    ROD: [12, 12],
+    TOZ: [6,  6],
+  };
+
+  // Compute the first valid purchase date (day 1 of the nominal purchase month)
+  // for a given bond name, e.g. "ROS0426" → "2020-04-01".
+  function getDefaultPurchaseDate(bondName) {
+    var kind   = bondName.substring(0, 3);
+    var series = bondName.substring(3);          // MMYY
+    var bp     = BOND_PERIODS[kind];
+    if (!bp || !/^\d{4}$/.test(series)) return null;
+
+    var mm = parseInt(series.substring(0, 2), 10);
+    var yy = parseInt(series.substring(2, 4), 10);
+    if (mm < 1 || mm > 12) return null;
+
+    var totalMonths       = bp[0] * bp[1];
+    var purchaseMonthIdx  = (mm - 1) - totalMonths;          // may be negative
+    var purchaseYear      = (2000 + yy) + Math.floor(purchaseMonthIdx / 12);
+    purchaseMonthIdx      = ((purchaseMonthIdx % 12) + 12) % 12;  // always 0–11
+
+    return purchaseYear + '-' + String(purchaseMonthIdx + 1).padStart(2, '0') + '-01';
+  }
+
+  // Force symbol to uppercase and auto-fill the purchase date
+  document.getElementById('name').addEventListener('input', function() {
+    var start = this.selectionStart, end = this.selectionEnd;
+    this.value = this.value.toUpperCase();
+    this.setSelectionRange(start, end);
+
+    if (/^[A-Z]{3}\d{4}$/.test(this.value)) {
+      var d = getDefaultPurchaseDate(this.value);
+      if (d) document.getElementById('purchase_date').value = d;
+    }
+  });
+
+  // Navigate to locale-prefixed detail page on submit
+  document.getElementById('lookup-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var name = document.getElementById('name').value.trim().toUpperCase();
+    var date = document.getElementById('purchase_date').value;
+    if (name && date) {
+      window.location.href = '/' + locale + '/bond/' + name + '/' + date;
+    }
+  });
+
+  // Colour palette for bond-kind badges (light / dark pairs)
+  var KIND_COLORS = {
+    OTS: 'bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300',
+    ROR: 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
+    DOR: 'bg-teal-100 text-teal-700 dark:bg-teal-900/50 dark:text-teal-300',
+    TOS: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
+    COI: 'bg-orange-100 text-orange-700 dark:bg-orange-900/50 dark:text-orange-300',
+    EDO: 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+    ROS: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
+    ROD: 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300',
+    TOZ: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300',
+  };
+
+  // Load available bond names for datalist + kind badges
+  fetch('/bonds')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var datalist = document.getElementById('bond-suggestions');
+      var typesDiv = document.getElementById('bond-types');
+      var placeholder = document.getElementById('bond-types-placeholder');
+      if (placeholder) placeholder.remove();
+
+      for (var kind of Object.keys(data)) {
+        var series = data[kind];
+
+        series.forEach(function(s) {
+          var opt = document.createElement('option');
+          opt.value = s;
+          datalist.appendChild(opt);
+        });
+
+        var colors = KIND_COLORS[kind] || 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300';
+        var badge = document.createElement('span');
+        badge.className = 'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ' + colors;
+        badge.textContent = kind + ' (' + series.length + ')';
+        typesDiv.appendChild(badge);
+      }
+    })
+    .catch(function() {
+      var placeholder = document.getElementById('bond-types-placeholder');
+      if (placeholder) placeholder.textContent = t.unavailable;
+    });
+</script>
+{% endblock %}

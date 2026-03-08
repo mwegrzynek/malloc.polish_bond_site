@@ -1,0 +1,47 @@
+{
+  "site_name": "Polish Bond Browser",
+
+  "tagline": "Look up a bond",
+  "tagline_sub": "Enter a bond symbol and purchase date to view details, value history, and cash flow.",
+
+  "symbol_label": "Bond symbol",
+  "symbol_placeholder": "e.g. EDO0336",
+  "symbol_hint": "Format: 3-letter type + month/year of maturity (MMYY)",
+  "date_label": "Purchase date",
+  "submit_btn": "Look up bond",
+
+  "available_types": "Available bond types",
+  "loading": "Loading\u2026",
+  "unavailable": "Unavailable",
+
+  "back_link": "\u2190 Back to search",
+
+  "badge_capitalising": "Capitalising",
+  "badge_coupon": "Coupon",
+
+  "stat_current_value": "Current value",
+  "matured_label": "Matured",
+  "stat_purchase_date": "Purchase date",
+  "stat_nominal_purchase": "Nominal purchase",
+  "stat_maturity_date": "Maturity date",
+
+  "rates_heading": "Interest rates",
+  "period_label": "Period",
+  "tbd_label": "TBD",
+
+  "chart_heading": "Value over time",
+  "chart_loading": "Loading chart\u2026",
+  "chart_unavailable": "Chart unavailable.",
+  "chart_value_label": "Value (PLN)",
+
+  "cashflow_heading": "Cash flow",
+  "col_date": "Date",
+  "col_event": "Event",
+  "col_amount": "Amount (PLN)",
+
+  "event_purchase": "Purchase",
+  "event_coupon": "Coupon",
+  "event_redemption": "Redemption",
+
+  "footer_data_source": "Data sourced from"
+}

@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bond.name }} – {{ t.site_name }}{% endblock %}
+
+{% block content %}
+
+{# ── breadcrumb ─────────────────────────────────────────────────────────── #}
+<a href="/{{ locale }}/" class="inline-flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 mb-6 transition-colors">
+  {{ t.back_link }}
+</a>
+
+{# ── bond heading ───────────────────────────────────────────────────────── #}
+<div class="flex items-baseline gap-3 mb-6">
+  <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100">{{ bond.name }}</h1>
+  <span class="rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-xs font-semibold px-2.5 py-1">{{ bond.kind }}</span>
+  {% if bond.capitalize %}
+  <span class="rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-xs font-semibold px-2.5 py-1">{{ t.badge_capitalising }}</span>
+  {% else %}
+  <span class="rounded-full bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 text-xs font-semibold px-2.5 py-1">{{ t.badge_coupon }}</span>
+  {% endif %}
+</div>
+
+{# ── stat cards ─────────────────────────────────────────────────────────── #}
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+  <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-4">
+    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">{{ t.stat_current_value }}</p>
+    {% if current_value is not none %}
+    <p class="text-2xl font-bold text-slate-900 dark:text-slate-100">{{ "%.2f"|format(current_value) }}&nbsp;<span class="text-base font-normal text-slate-400 dark:text-slate-500">PLN</span></p>
+    {% else %}
+    <p class="text-lg font-semibold text-slate-400 dark:text-slate-500 italic">{{ t.matured_label }}</p>
+    {% endif %}
+  </div>
+
+  <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-4">
+    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">{{ t.stat_purchase_date }}</p>
+    <p class="text-xl font-bold text-slate-900 dark:text-slate-100">{{ bond.purchase_date }}</p>
+  </div>
+
+  <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-4">
+    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">{{ t.stat_nominal_purchase }}</p>
+    <p class="text-xl font-bold text-slate-900 dark:text-slate-100">{{ bond.nominal_purchase_date }}</p>
+  </div>
+
+  <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-4">
+    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">{{ t.stat_maturity_date }}</p>
+    <p class="text-xl font-bold text-slate-900 dark:text-slate-100">{{ bond.maturity_date }}</p>
+  </div>
+</div>
+
+{# ── interest rates ─────────────────────────────────────────────────────── #}
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 mb-8">
+  <h2 class="text-base font-semibold text-slate-800 dark:text-slate-200 mb-3">{{ t.rates_heading }}</h2>
+  <div class="flex flex-wrap gap-2">
+    {% for rate in bond.rates %}
+    <div class="rounded-lg border px-3 py-2 text-center min-w-[72px]
+      {% if rate is none %}
+        border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50
+      {% else %}
+        border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/30
+      {% endif %}">
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">{{ t.period_label }} {{ loop.index }}</p>
+      {% if rate is not none %}
+      <p class="text-sm font-bold text-blue-700 dark:text-blue-300">{{ "%.2f"|format(rate * 100) }}%</p>
+      {% else %}
+      <p class="text-sm font-bold text-slate-400 dark:text-slate-500">{{ t.tbd_label }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{# ── value chart ─────────────────────────────────────────────────────────── #}
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 mb-8">
+  <h2 class="text-base font-semibold text-slate-800 dark:text-slate-200 mb-4">{{ t.chart_heading }}</h2>
+  <div class="relative h-64">
+    <canvas id="value-chart"></canvas>
+  </div>
+  <p id="chart-status" class="mt-2 text-xs text-slate-400 dark:text-slate-500 text-center">{{ t.chart_loading }}</p>
+</div>
+
+{# ── cash flow ───────────────────────────────────────────────────────────── #}
+<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5">
+  <h2 class="text-base font-semibold text-slate-800 dark:text-slate-200 mb-4">{{ t.cashflow_heading }}</h2>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-slate-200 dark:border-slate-600 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+          <th class="pb-2 pr-4">{{ t.col_date }}</th>
+          <th class="pb-2 pr-4">{{ t.col_event }}</th>
+          <th class="pb-2 text-right">{{ t.col_amount }}</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+        {% for row in cash_flow %}
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/40">
+          <td class="py-2 pr-4 font-mono text-slate-600 dark:text-slate-400">
+            {{ row.date | string | truncate(10, true, '') }}
+          </td>
+          <td class="py-2 pr-4">
+            {% if row.event.value == 'purchase' %}
+            <span class="inline-block rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2 py-0.5">{{ t.event_purchase }}</span>
+            {% elif row.event.value == 'coupon' %}
+            <span class="inline-block rounded-full bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 text-xs px-2 py-0.5">{{ t.event_coupon }}</span>
+            {% elif row.event.value == 'redemption' %}
+            <span class="inline-block rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 text-xs px-2 py-0.5">{{ t.event_redemption }}</span>
+            {% else %}
+            <span class="inline-block rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2 py-0.5">{{ row.event }}</span>
+            {% endif %}
+          </td>
+          <td class="py-2 text-right font-mono
+            {% if row.value < 0 %}text-red-600 dark:text-red-400{% else %}text-emerald-600 dark:text-emerald-400{% endif %}">
+            {{ "%+.2f"|format(row.value) }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+(function() {
+  var t            = {{ t | tojson }};
+  var bondName     = {{ bond.name | tojson }};
+  var purchaseDate = {{ bond.purchase_date | string | tojson }};
+  var isDark       = document.documentElement.classList.contains('dark');
+
+  var colors = isDark ? {
+    border: '#60a5fa', background: 'rgba(96,165,250,0.12)',
+    tick: '#94a3b8',   grid: 'rgba(148,163,184,0.15)',
+  } : {
+    border: '#3b82f6', background: 'rgba(59,130,246,0.08)',
+    tick: '#64748b',   grid: 'rgba(100,116,139,0.12)',
+  };
+
+  fetch('/by_name/' + bondName + '/' + purchaseDate + '/daily_values')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var step = Math.max(1, Math.floor(data.length / 200));
+      var sampled = data.filter(function(_, i) {
+        return i % step === 0 || i === data.length - 1;
+      });
+
+      var ctx = document.getElementById('value-chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: sampled.map(function(d) { return String(d.date).substring(0, 10); }),
+          datasets: [{
+            label: t.chart_value_label,
+            data: sampled.map(function(d) { return d.value; }),
+            borderColor: colors.border,
+            backgroundColor: colors.background,
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.1,
+            fill: true,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: isDark ? '#1e293b' : '#fff',
+              borderColor: isDark ? '#334155' : '#e2e8f0',
+              borderWidth: 1,
+              titleColor: isDark ? '#cbd5e1' : '#475569',
+              bodyColor: isDark ? '#f1f5f9' : '#0f172a',
+              callbacks: {
+                label: function(ctx) { return ctx.parsed.y.toFixed(2) + ' PLN'; }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { maxTicksLimit: 8, font: { size: 11 }, color: colors.tick },
+              grid: { color: colors.grid }
+            },
+            y: {
+              ticks: {
+                font: { size: 11 }, color: colors.tick,
+                callback: function(v) { return v.toFixed(0) + ' PLN'; }
+              },
+              grid: { color: colors.grid }
+            }
+          }
+        }
+      });
+
+      document.getElementById('chart-status').remove();
+    })
+    .catch(function() {
+      document.getElementById('chart-status').textContent = t.chart_unavailable;
+    });
+})();
+</script>
+{% endblock %}
